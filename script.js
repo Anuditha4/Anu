@@ -1,4 +1,4 @@
-// script.js - Complete Birthday Website
+// script.js - Complete Fixed Birthday Website
 
 // Global Variables
 let currentPage = 0;
@@ -7,21 +7,38 @@ let photos = [];
 let heartAnimationInterval = null;
 let backgroundMusic = null;
 let isMusicPlaying = false;
+let countdownInterval = null;
+let waterInterval = null;
+let textInterval = null;
 
-// Sample Photos (Replace with your own)
+// Sample Photos (Replace with your own photos)
 const samplePhotos = [
-    'https://picsum.photos/id/20/300/400',  // Replace with your photo
-    'https://picsum.photos/id/25/300/400',  // Replace with your photo
-    'https://picsum.photos/id/26/300/400',  // Replace with your photo
-    'https://picsum.photos/id/28/300/400',  // Replace with your photo
-    'https://picsum.photos/id/29/300/400',  // Replace with your photo
-    'https://picsum.photos/id/30/300/400'   // Replace with your photo
+    'https://picsum.photos/id/20/300/400',
+    'https://picsum.photos/id/25/300/400',
+    'https://picsum.photos/id/26/300/400',
+    'https://picsum.photos/id/28/300/400',
+    'https://picsum.photos/id/29/300/400',
+    'https://picsum.photos/id/30/300/400'
+];
+
+// Heart Photos for gallery
+const heartPhotosList = [
+    'https://picsum.photos/id/100/200/200',
+    'https://picsum.photos/id/101/200/200',
+    'https://picsum.photos/id/102/200/200',
+    'https://picsum.photos/id/103/200/200',
+    'https://picsum.photos/id/104/200/200',
+    'https://picsum.photos/id/106/200/200',
+    'https://picsum.photos/id/107/200/200',
+    'https://picsum.photos/id/108/200/200'
 ];
 
 // Wait for DOM to load
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Website loaded - starting countdown');
     initCountdown();
     initMusicControl();
+    initSurpriseButton();
 });
 
 // ===== 1. COUNTDOWN WITH PARTICLE EFFECT =====
@@ -29,6 +46,12 @@ function initCountdown() {
     let count = 1;
     const countdownElement = document.getElementById('countdownNumber');
     const canvas = document.getElementById('particleCanvas');
+    
+    if (!canvas) {
+        console.error('Canvas not found');
+        return;
+    }
+    
     const ctx = canvas.getContext('2d');
     
     // Set canvas size
@@ -57,6 +80,7 @@ function initCountdown() {
     }
     
     function animateParticles() {
+        if (!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         for (let i = particles.length - 1; i >= 0; i--) {
@@ -84,8 +108,9 @@ function initCountdown() {
     }
     
     // Countdown animation
-    const interval = setInterval(() => {
+    countdownInterval = setInterval(() => {
         if (count <= 3) {
+            console.log('Countdown:', count);
             // Update number
             countdownElement.textContent = count;
             
@@ -98,12 +123,18 @@ function initCountdown() {
             
             count++;
         } else {
-            clearInterval(interval);
-            // End countdown
-            document.getElementById('countdownOverlay').style.opacity = '0';
+            clearInterval(countdownInterval);
+            // End countdown with fade out
+            const overlay = document.getElementById('countdownOverlay');
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 1s ease';
+            
             setTimeout(() => {
-                document.getElementById('countdownOverlay').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
+                overlay.classList.add('hidden');
+                const mainContent = document.getElementById('mainContent');
+                mainContent.classList.remove('hidden');
+                
+                // Initialize all features
                 initWaterFlow();
                 initTextReveal();
             }, 1000);
@@ -113,7 +144,14 @@ function initCountdown() {
 
 // ===== 2. WATER FLOW ANIMATION =====
 function initWaterFlow() {
+    console.log('Initializing water flow');
     const waterCanvas = document.getElementById('waterCanvas');
+    
+    if (!waterCanvas) {
+        console.error('Water canvas not found');
+        return;
+    }
+    
     const ctx = waterCanvas.getContext('2d');
     const textOverlay = document.getElementById('waterTextOverlay');
     
@@ -153,15 +191,17 @@ function initWaterFlow() {
         textOverlay.appendChild(text);
         
         setTimeout(() => {
-            text.remove();
+            if (text && text.remove) text.remove();
         }, 8000);
     }
     
     // Create text every 500ms
-    setInterval(createFloatingText, 500);
+    if (waterInterval) clearInterval(waterInterval);
+    waterInterval = setInterval(createFloatingText, 500);
     
     // Animate water drops
     function animateWater() {
+        if (!ctx) return;
         ctx.clearRect(0, 0, waterCanvas.width, waterCanvas.height);
         
         // Draw gradient background
@@ -194,13 +234,16 @@ function initWaterFlow() {
 
 // ===== 3. SEQUENTIAL TEXT REVEAL =====
 function initTextReveal() {
+    console.log('Initializing text reveal');
     const texts = ['text1', 'text2', 'text3', 'text4'];
     let delay = 0;
     
     texts.forEach((textId, index) => {
         setTimeout(() => {
             const element = document.getElementById(textId);
-            element.classList.add('show');
+            if (element) {
+                element.classList.add('show');
+            }
         }, delay);
         delay += 800;
     });
@@ -208,32 +251,46 @@ function initTextReveal() {
     // Show heart rotation after all text
     setTimeout(() => {
         const heartRotation = document.getElementById('heartRotation');
-        heartRotation.classList.add('show');
+        if (heartRotation) {
+            heartRotation.classList.add('show');
+        }
     }, delay + 500);
     
     // Show memory book after heart animation
     setTimeout(() => {
-        document.getElementById('textRevealSection').style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById('textRevealSection').classList.add('hidden');
-            document.getElementById('memoryBookSection').classList.remove('hidden');
-            initMemoryBook();
-        }, 1000);
+        const textSection = document.getElementById('textRevealSection');
+        if (textSection) {
+            textSection.style.opacity = '0';
+            textSection.style.transition = 'opacity 1s ease';
+            setTimeout(() => {
+                textSection.classList.add('hidden');
+                const memoryBook = document.getElementById('memoryBookSection');
+                if (memoryBook) {
+                    memoryBook.classList.remove('hidden');
+                    initMemoryBook();
+                }
+            }, 1000);
+        }
     }, delay + 4000);
 }
 
 // ===== 4. MEMORY BOOK =====
 function initMemoryBook() {
+    console.log('Initializing memory book');
     const bookCover = document.getElementById('bookCover');
     const bookPages = document.getElementById('bookPages');
     let isOpen = false;
+    
+    if (!bookPages) return;
+    
+    // Clear existing pages
+    bookPages.innerHTML = '';
     
     // Create pages
     for (let i = 0; i < totalPages; i++) {
         const page = document.createElement('div');
         page.className = 'page';
-        if (i === 0) page.classList.add('page-front');
-        if (i === totalPages - 1) page.classList.add('page-back');
+        if (i === 0) page.classList.add('active');
         
         const img = document.createElement('img');
         img.src = samplePhotos[i % samplePhotos.length];
@@ -244,89 +301,108 @@ function initMemoryBook() {
     }
     
     // Create page controls
-    const controls = document.createElement('div');
-    controls.className = 'page-controls';
-    controls.innerHTML = `
-        <button class="page-btn" id="prevPage">◀ Previous</button>
-        <button class="page-btn" id="nextPage">Next ▶</button>
-    `;
-    document.querySelector('.book-container').appendChild(controls);
+    let controls = document.querySelector('.page-controls');
+    if (!controls) {
+        controls = document.createElement('div');
+        controls.className = 'page-controls';
+        controls.innerHTML = `
+            <button class="page-btn" id="prevPage">◀ Previous</button>
+            <button class="page-btn" id="nextPage">Next ▶</button>
+        `;
+        document.querySelector('.book-container').appendChild(controls);
+    }
     
     function updatePages() {
         const pages = document.querySelectorAll('.page');
         pages.forEach((page, index) => {
             if (index === currentPage) {
+                page.classList.add('active');
                 page.style.display = 'flex';
             } else {
+                page.classList.remove('active');
                 page.style.display = 'none';
             }
         });
     }
     
     // Book open/close
-    bookCover.addEventListener('click', () => {
-        if (!isOpen) {
-            bookPages.classList.add('open');
-            bookCover.style.transform = 'rotateY(-180deg)';
-            isOpen = true;
-            updatePages();
-        }
-    });
+    if (bookCover) {
+        bookCover.addEventListener('click', () => {
+            if (!isOpen) {
+                bookPages.classList.add('open');
+                bookCover.style.transform = 'rotateY(-180deg)';
+                isOpen = true;
+                updatePages();
+            }
+        });
+    }
     
     // Page navigation
-    document.getElementById('prevPage')?.addEventListener('click', () => {
-        if (currentPage > 0) {
-            currentPage--;
-            updatePages();
-        }
-    });
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
     
-    document.getElementById('nextPage')?.addEventListener('click', () => {
-        if (currentPage < totalPages - 1) {
-            currentPage++;
-            updatePages();
-        } else {
-            // After last page, show photo hearts
-            document.getElementById('memoryBookSection').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('memoryBookSection').classList.add('hidden');
-                document.getElementById('photoHeartSection').classList.remove('hidden');
-                initPhotoHearts();
-            }, 1000);
-        }
-    });
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                updatePages();
+            }
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                updatePages();
+            } else {
+                // After last page, show photo hearts
+                const memorySection = document.getElementById('memoryBookSection');
+                if (memorySection) {
+                    memorySection.style.opacity = '0';
+                    memorySection.style.transition = 'opacity 1s ease';
+                    setTimeout(() => {
+                        memorySection.classList.add('hidden');
+                        const photoSection = document.getElementById('photoHeartSection');
+                        if (photoSection) {
+                            photoSection.classList.remove('hidden');
+                            initPhotoHearts();
+                        }
+                    }, 1000);
+                }
+            }
+        });
+    }
     
     updatePages();
 }
 
 // ===== 5. PHOTO HEART ANIMATION =====
 function initPhotoHearts() {
+    console.log('Initializing photo hearts');
     const container = document.getElementById('heartsContainer');
-    const heartPhotos = [
-        'https://picsum.photos/id/100/200/200',
-        'https://picsum.photos/id/101/200/200',
-        'https://picsum.photos/id/102/200/200',
-        'https://picsum.photos/id/103/200/200',
-        'https://picsum.photos/id/104/200/200',
-        'https://picsum.photos/id/106/200/200',
-        'https://picsum.photos/id/107/200/200',
-        'https://picsum.photos/id/108/200/200'
-    ];
     
+    if (!container) return;
+    
+    container.innerHTML = '';
     let index = 0;
     
     function addHeartPhoto() {
-        if (index >= heartPhotos.length) {
-            clearInterval(heartAnimationInterval);
+        if (index >= heartPhotosList.length) {
+            if (heartAnimationInterval) {
+                clearInterval(heartAnimationInterval);
+            }
             // Show surprise button section
             setTimeout(() => {
-                document.getElementById('surpriseSection').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('surpriseSection').classList.remove('hidden');
+                const surpriseSection = document.getElementById('surpriseSection');
+                if (surpriseSection) {
+                    surpriseSection.classList.remove('hidden');
+                    surpriseSection.style.opacity = '0';
                     setTimeout(() => {
-                        document.getElementById('surpriseSection').style.opacity = '1';
+                        surpriseSection.style.opacity = '1';
+                        surpriseSection.style.transition = 'opacity 0.5s ease';
                     }, 100);
-                }, 500);
+                }
             }, 1000);
             return;
         }
@@ -335,28 +411,167 @@ function initPhotoHearts() {
         heartDiv.className = 'heart-photo';
         
         const img = document.createElement('img');
-        img.src = heartPhotos[index];
+        img.src = heartPhotosList[index];
         img.alt = `Memory ${index + 1}`;
         
         heartDiv.appendChild(img);
         container.appendChild(heartDiv);
         
-        // Add click effect
-        heartDiv.addEventListener('click', () => {
+        // Add click effect with confetti
+        heartDiv.addEventListener('click', (e) => {
             heartDiv.style.transform = 'scale(1.2)';
             setTimeout(() => {
                 heartDiv.style.transform = '';
             }, 300);
-            createConfetti(heartDiv);
+            
+            // Small confetti burst
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 30,
+                    spread: 45,
+                    origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+                    colors: ['#ff69b4', '#ff1493', '#ffd700']
+                });
+            }
         });
         
         index++;
     }
     
-    // Add hearts every 500ms
+    // Add hearts every 600ms
+    if (heartAnimationInterval) clearInterval(heartAnimationInterval);
     heartAnimationInterval = setInterval(addHeartPhoto, 600);
 }
 
 // ===== 6. SURPRISE BUTTON =====
 function initSurpriseButton() {
-    const surprise
+    const surpriseBtn = document.getElementById('surpriseBtn');
+    const surpriseModal = document.getElementById('surpriseModal');
+    const modalClose = document.querySelector('.modal-close');
+    const balloonsContainer = document.getElementById('balloonsContainer');
+    
+    if (!surpriseBtn) return;
+    
+    surpriseBtn.addEventListener('click', function() {
+        // Show modal
+        if (surpriseModal) {
+            surpriseModal.classList.remove('hidden');
+            
+            // Create balloons
+            if (balloonsContainer) {
+                balloonsContainer.innerHTML = '';
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const balloon = document.createElement('div');
+                        balloon.className = 'balloon';
+                        balloon.innerHTML = ['🎈', '🎈', '🎈', '🎉', '🎊'][Math.floor(Math.random() * 5)];
+                        balloon.style.left = Math.random() * 100 + '%';
+                        balloon.style.bottom = '-50px';
+                        balloon.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                        balloon.style.position = 'absolute';
+                        balloon.style.animation = `floatBalloon ${Math.random() * 3 + 2}s ease-in forwards`;
+                        balloonsContainer.appendChild(balloon);
+                        
+                        setTimeout(() => {
+                            balloon.remove();
+                        }, 3000);
+                    }, i * 100);
+                }
+            }
+            
+            // Confetti explosion
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 200,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: ['#ff69b4', '#ff1493', '#ffd700', '#ff0066']
+                });
+                
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 150,
+                        spread: 70,
+                        origin: { y: 0.5, x: 0.2 }
+                    });
+                }, 200);
+                
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 150,
+                        spread: 70,
+                        origin: { y: 0.5, x: 0.8 }
+                    });
+                }, 400);
+            }
+        }
+        
+        // Button animation
+        surpriseBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            surpriseBtn.style.transform = '';
+        }, 150);
+    });
+    
+    // Close modal
+    if (modalClose) {
+        modalClose.addEventListener('click', () => {
+            if (surpriseModal) {
+                surpriseModal.classList.add('hidden');
+            }
+        });
+    }
+    
+    // Close on outside click
+    if (surpriseModal) {
+        surpriseModal.addEventListener('click', (e) => {
+            if (e.target === surpriseModal) {
+                surpriseModal.classList.add('hidden');
+            }
+        });
+    }
+}
+
+// ===== 7. MUSIC CONTROL =====
+function initMusicControl() {
+    const musicToggle = document.getElementById('musicToggle');
+    
+    // Create audio element
+    backgroundMusic = new Audio();
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.3;
+    
+    // Try to load a free romantic music from online
+    // You can replace this URL with your own music file
+    backgroundMusic.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+    
+    if (musicToggle) {
+        musicToggle.addEventListener('click', () => {
+            if (!isMusicPlaying) {
+                backgroundMusic.play().then(() => {
+                    isMusicPlaying = true;
+                    musicToggle.innerHTML = '🔊 Music On';
+                    musicToggle.style.background = '#ff69b4';
+                    musicToggle.style.color = 'white';
+                }).catch(e => {
+                    console.log('Music play failed:', e);
+                    musicToggle.innerHTML = '🔇 Music (Click page first)';
+                });
+            } else {
+                backgroundMusic.pause();
+                isMusicPlaying = false;
+                musicToggle.innerHTML = '🔇 Music Off';
+                musicToggle.style.background = 'rgba(0,0,0,0.7)';
+                musicToggle.style.color = '#ff69b4';
+            }
+        });
+    }
+}
+
+// ===== CLEANUP ON PAGE UNLOAD =====
+window.addEventListener('beforeunload', () => {
+    if (countdownInterval) clearInterval(countdownInterval);
+    if (waterInterval) clearInterval(waterInterval);
+    if (heartAnimationInterval) clearInterval(heartAnimationInterval);
+    if (backgroundMusic) backgroundMusic.pause();
+});
