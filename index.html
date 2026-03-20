@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Nimuu ❤️</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="main-container">
+        
+        <!-- Countdown Overlay -->
+        <div id="countdownOverlay" class="countdown-overlay">
+            <div id="countdownNumber" class="countdown-number">1</div>
+            <canvas id="particleCanvas" class="particle-canvas"></canvas>
+        </div>
+        
+        <!-- Main Content (Hidden until countdown ends) -->
+        <div id="mainContent" class="main-content hidden">
+            
+            <!-- Water Flow Background -->
+            <div class="water-flow-container">
+                <canvas id="waterCanvas" class="water-canvas"></canvas>
+                <div class="water-text-overlay" id="waterTextOverlay"></div>
+            </div>
+            
+            <!-- Sequential Text Reveal Section -->
+            <div class="text-reveal-section" id="textRevealSection">
+                <div class="reveal-text" id="text1">Happy</div>
+                <div class="reveal-text" id="text2">Birthday</div>
+                <div class="reveal-text cursive" id="text3">My Loving</div>
+                <div class="reveal-text name-text" id="text4">Nimuu</div>
+                <div class="heart-rotation" id="heartRotation">
+                    <div class="rotating-heart">❤️</div>
+                    <div class="love-text">I love youu</div>
+                </div>
+            </div>
+            
+            <!-- Memory Book Section (Hidden initially) -->
+            <div id="memoryBookSection" class="memory-book-section hidden">
+                <div class="book-container" id="bookContainer">
+                    <div class="book">
+                        <div class="book-cover" id="bookCover">
+                            <div class="book-title">Memory Book</div>
+                            <div class="book-subtitle">Click to open ❤️</div>
+                        </div>
+                        <div class="book-pages" id="bookPages">
+                            <!-- Pages will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Heart Border Text Box -->
+                <div class="heart-border-box">
+                    <textarea id="personalMessage" placeholder="Write your special message here... 💕" rows="4"></textarea>
+                </div>
+            </div>
+            
+            <!-- Photo Heart Animation Section -->
+            <div id="photoHeartSection" class="photo-heart-section hidden">
+                <h2 class="section-title">Our Beautiful Moments</h2>
+                <div class="hearts-container" id="heartsContainer"></div>
+            </div>
+            
+            <!-- Surprise Button Section -->
+            <div class="surprise-section" id="surpriseSection">
+                <button id="surpriseBtn" class="surprise-button">Click for a surprise 🎁</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Surprise Modal -->
+    <div id="surpriseModal" class="surprise-modal hidden">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-message">
+                <h2>🎉 Happy Birthday My Love! 🎉</h2>
+                <p>You are the most precious gift in my life.</p>
+                <p>Every moment with you is magical.</p>
+                <p>May your day be as beautiful as your heart! ❤️</p>
+                <div class="balloons-container" id="balloonsContainer"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Music Control -->
+    <div class="music-control">
+        <button id="musicToggle" class="music-btn">🔇 Music Off</button>
+    </div>
+    
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <script src="script.js"></script>
+</body>
+</html>
